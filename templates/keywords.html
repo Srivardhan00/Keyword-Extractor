@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Keyword Extraction Results</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"/>
+</head>
+<body>
+    <div class="container">
+        <h2>Keyword Extraction Results</h2>
+        <ul class="list-group">
+            {% for keyword in keywords %}
+            <li class="list-group-item">{{ keyword }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+</body>
+</html>

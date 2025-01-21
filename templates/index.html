@@ -1,0 +1,123 @@
+<!-- <!DOCTYPE html>
+<html>
+  <head>
+    <title>Keyword Extraction</title>
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+    />
+    <script>
+      function validateForm() {
+        let textInput = document.forms["textForm"]["text"].value;
+        let fileInput = document.forms["textForm"]["file"].value;
+        if (textInput.trim() === "" && fileInput === "") {
+          alert("Please enter text or upload a file before submitting.");
+          return false;
+        }
+        return true;
+      }
+    </script>
+  </head>
+  <body>
+    <div class="container">
+      <h2>Enter Text or Upload File for Keyword Extraction</h2>
+      <form
+        name="textForm"
+        action="{{ url_for('process_text') }}"
+        method="POST"
+        enctype="multipart/form-data"
+        onsubmit="return validateForm()"
+      >
+        <div class="form-group">
+          <textarea
+            name="text"
+            class="form-control"
+            rows="10"
+            placeholder="Enter your text here..."
+          ></textarea>
+        </div>
+        <div class="form-group">
+          <label for="file">Or upload a PDF/Word document:</label>
+          <input
+            type="file"
+            name="file"
+            accept=".pdf,.docx"
+            class="form-control"
+          />
+        </div>
+        <button type="submit" class="btn btn-primary">Extract Keywords</button>
+      </form>
+    </div>
+  </body>
+</html> -->
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Keyword Extraction</title>
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+    />
+    <script>
+      function validateForm() {
+        let textInput = document.forms["textForm"]["text"].value;
+        let fileInput = document.forms["textForm"]["file"].value;
+        let keywordCount = document.forms["textForm"]["keyword_count"].value;
+
+        if (textInput.trim() === "" && fileInput === "") {
+          alert("Please enter text or upload a file before submitting.");
+          return false;
+        }
+
+        // if (keywordCount.trim() === "" || isNaN(keywordCount) || keywordCount <= 0) {
+        //   alert("Please enter a valid number of keywords.");
+        //   return false;
+        // }
+        return true;
+      }
+    </script>
+  </head>
+  <body>
+    <div class="container">
+      <h2>Enter Text or Upload File for Keyword Extraction</h2>
+      <form
+        name="textForm"
+        action="{{ url_for('process_text') }}"
+        method="POST"
+        enctype="multipart/form-data"
+        onsubmit="return validateForm()"
+      >
+        <div class="form-group">
+          <textarea
+            name="text"
+            class="form-control"
+            rows="10"
+            placeholder="Enter your text here..."
+          ></textarea>
+        </div>
+        <div class="form-group">
+          <label for="file">Or upload a PDF/Word document:</label>
+          <input
+            type="file"
+            name="file"
+            accept=".pdf,.docx"
+            class="form-control"
+          />
+        </div>
+        <div class="form-group">
+          <label for="keyword_count">Number of Keywords:</label>
+          <input
+            type="number"
+            name="keyword_count"
+            class="form-control"
+            min="1"
+            placeholder="Enter the number of keywords to extract"
+            value="10"
+            required
+          />
+        </div>
+        <button type="submit" class="btn btn-primary">Extract Keywords</button>
+      </form>
+    </div>
+  </body>
+</html>
