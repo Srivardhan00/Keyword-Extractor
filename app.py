@@ -31,72 +31,36 @@ def preprocess_text(text):
     text = [word for word in text if word not in stopwords_set and len(word) > 3]  # Remove stop words and short words
     stemming = PorterStemmer()
     text = [stemming.stem(word) for word in text]  # Stem the words
-    text = list(set(text))  # Keep unique words
     return " ".join(text)
 
-# def get_keywords(idx, docs, topN):
-#     print(topN)
-#     cv = CountVectorizer(max_df=0.95, max_features=5000, ngram_range=(1, 1))
-#     word_count_vector = cv.fit_transform(docs)
-#     tf_transformer = TfidfTransformer(smooth_idf=True, use_idf=True)
-#     tf_transformer = tf_transformer.fit(word_count_vector)
-#     feature_names = cv.get_feature_names_out()
-#     docs_word_count = tf_transformer.transform(cv.transform([docs[idx]]))
-#     docs_word_count = docs_word_count.tocoo()
-
-#     tuples = zip(docs_word_count.col, docs_word_count.data)
-#     sorted_all_items = sorted(tuples, key=lambda x: (x[1], x[0]), reverse=True)
-
-#     sorted_items = []
-#     for i in range(len(sorted_all_items)):
-#         sorted_items.append(sorted_all_items[i])
-#         if i == topN - 1:
-#             break
-
-#     score_vals = []
-#     feature_vals = []
-#     for idx, score in sorted_items:
-#         score_vals.append(round(score, 3))
-#         feature_vals.append(feature_names[idx])
-
-#     result = {}
-#     for idx in range(len(feature_vals)):
-#         result[feature_vals[idx]] = score_vals[idx]
-
-#     return result
-
-def get_keywords(idx, docs, topN):
+def get_keywords(docs, topN):
+    combined_text = " ".join(docs)
     # Fit CountVectorizer on the entire corpus
-    cv = CountVectorizer(max_df=0.95, max_features=5000, ngram_range=(1, 1))
-    word_count_vector = cv.fit_transform(docs)
+    cv = CountVectorizer(max_df=1, min_df=0.2, max_features=5000, ngram_range=(1, 1))
+    word_count_vector = cv.fit_transform([combined_text])
     
     # Fit TF-IDF transformer on the word count vector of the entire corpus
     tf_transformer = TfidfTransformer(smooth_idf=True, use_idf=True)
     tf_transformer = tf_transformer.fit(word_count_vector)
     
     # Extract feature names (i.e., words)
-    feature_names = cv.get_feature_names_out()
-    
-    # Transform only the specified document (docs[idx])
-    single_doc_vector = tf_transformer.transform(cv.transform([docs[idx]]))
-    
-    # Convert to a sparse matrix representation
-    single_doc_vector = single_doc_vector.tocoo()
-    
-    # Get non-zero TF-IDF values and corresponding words
-    tuples = zip(single_doc_vector.col, single_doc_vector.data)
+    tf_idf_vector = tf_transformer.transform(word_count_vector)
+    feature_names = cv.get_feature_names_out()    
+
+    tf_idf_vector = tf_idf_vector.tocoo()  # Sparse COO format
+        
     
     # Sort tuples based on TF-IDF score (highest to lowest)
-    sorted_items = sorted(tuples, key=lambda x: (x[1], x[0]), reverse=True)
-    
-    # Select the top N items based on sorted scores
-    top_keywords = sorted_items[:topN]
+    word_scores = [(feature_names[idx], score) for idx, score in zip(tf_idf_vector.col, tf_idf_vector.data)]
+    sorted_items = sorted(word_scores, key=lambda x: x[1], reverse=True)
+
     
     # Prepare the result as a dictionary {word: score}
     result = {}
-    for idx, score in top_keywords:
-        result[feature_names[idx]] = round(score, 3)
-    
+    for i in range(topN):
+        word, score = sorted_items[i]
+        result[word] = round(score, 3)  # Round to 3 decimal places
+
     return result
 
 def extract_text_from_pdf(pdf_path):
@@ -146,15 +110,16 @@ def process_text():
         num_keywords = 10  # Fallback to 10 if conversion fails
 
     # Split text into smaller documents
-    text_list = text.split(' ')
+    text_list = text.split('.')
     n = len(text_list)
-    docs = []
-    for i in range(0, n, 20):
-        docs.append(preprocess_text(' '.join(text_list[i:i+20])))
+    docs=[]
+    for i in range(n):
+        curr_text = preprocess_text(text_list[i])
+        if curr_text:
+            docs.append(curr_text)
 
     # Get keywords for the first document as an example
-    idx = 0
-    keywords = get_keywords(idx, docs, num_keywords)
+    keywords = get_keywords(docs, num_keywords)
 
     return render_template('keywords.html', keywords=keywords.keys())
 
