@@ -2,12 +2,12 @@ from flask import Flask, request, render_template, redirect, url_for
 import re
 import nltk
 from nltk.corpus import stopwords
-from nltk.stem import PorterStemmer
 from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
 from werkzeug.utils import secure_filename
 import os
 from PyPDF2 import PdfReader
 import docx
+from nltk.stem import WordNetLemmatizer
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = 'uploads'
@@ -16,6 +16,7 @@ app.config['ALLOWED_EXTENSIONS'] = {'pdf', 'docx'}
 # Download necessary NLTK data
 nltk.download('punkt')
 nltk.download('stopwords')
+nltk.download('wordnet')
 
 # Load stopwords
 stopwords_set = set(stopwords.words('english'))
@@ -29,8 +30,8 @@ def preprocess_text(text):
     text = re.sub(r'[^a-zA-Z]', ' ', text)  # Remove punctuation and special characters
     text = nltk.word_tokenize(text)  # Tokenize the text
     text = [word for word in text if word not in stopwords_set and len(word) > 3]  # Remove stop words and short words
-    stemming = PorterStemmer()
-    text = [stemming.stem(word) for word in text]  # Stem the words
+    lemmatizer = WordNetLemmatizer()
+    text = [lemmatizer.lemmatize(word) for word in text]
     return " ".join(text)
 
 def get_keywords(docs, topN):
