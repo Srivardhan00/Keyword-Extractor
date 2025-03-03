@@ -1,55 +1,3 @@
-<!-- <!DOCTYPE html>
-<html>
-  <head>
-    <title>Keyword Extraction</title>
-    <link
-      rel="stylesheet"
-      href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
-    />
-    <script>
-      function validateForm() {
-        let textInput = document.forms["textForm"]["text"].value;
-        let fileInput = document.forms["textForm"]["file"].value;
-        if (textInput.trim() === "" && fileInput === "") {
-          alert("Please enter text or upload a file before submitting.");
-          return false;
-        }
-        return true;
-      }
-    </script>
-  </head>
-  <body>
-    <div class="container">
-      <h2>Enter Text or Upload File for Keyword Extraction</h2>
-      <form
-        name="textForm"
-        action="{{ url_for('process_text') }}"
-        method="POST"
-        enctype="multipart/form-data"
-        onsubmit="return validateForm()"
-      >
-        <div class="form-group">
-          <textarea
-            name="text"
-            class="form-control"
-            rows="10"
-            placeholder="Enter your text here..."
-          ></textarea>
-        </div>
-        <div class="form-group">
-          <label for="file">Or upload a PDF/Word document:</label>
-          <input
-            type="file"
-            name="file"
-            accept=".pdf,.docx"
-            class="form-control"
-          />
-        </div>
-        <button type="submit" class="btn btn-primary">Extract Keywords</button>
-      </form>
-    </div>
-  </body>
-</html> -->
 <!DOCTYPE html>
 <html>
   <head>
@@ -61,25 +9,23 @@
     <script>
       function validateForm() {
         let textInput = document.forms["textForm"]["text"].value;
-        let fileInput = document.forms["textForm"]["file"].value;
+        let fileInput = document.forms["textForm"]["files"].files;
         let keywordCount = document.forms["textForm"]["keyword_count"].value;
 
-        if (textInput.trim() === "" && fileInput === "") {
-          alert("Please enter text or upload a file before submitting.");
+        if (textInput.trim() === "" && fileInput.length === 0) {
+          alert(
+            "Please enter text or upload at least one file before submitting."
+          );
           return false;
         }
 
-        // if (keywordCount.trim() === "" || isNaN(keywordCount) || keywordCount <= 0) {
-        //   alert("Please enter a valid number of keywords.");
-        //   return false;
-        // }
         return true;
       }
     </script>
   </head>
   <body>
     <div class="container">
-      <h2>Enter Text or Upload File for Keyword Extraction</h2>
+      <h2>Enter Text or Upload File(s) for Keyword Extraction</h2>
       <form
         name="textForm"
         action="{{ url_for('process_text') }}"
@@ -91,19 +37,24 @@
           <textarea
             name="text"
             class="form-control"
-            rows="10"
+            rows="5"
             placeholder="Enter your text here..."
           ></textarea>
         </div>
+
         <div class="form-group">
-          <label for="file">Or upload a PDF/Word document:</label>
+          <label for="files">Or upload PDF/Word documents:</label>
           <input
             type="file"
-            name="file"
+            name="files"
+            id="files"
             accept=".pdf,.docx"
             class="form-control"
+            multiple
           />
+          <small class="text-muted">You can upload multiple files.</small>
         </div>
+
         <div class="form-group">
           <label for="keyword_count">Number of Keywords:</label>
           <input
@@ -116,7 +67,23 @@
             required
           />
         </div>
+
         <button type="submit" class="btn btn-primary">Extract Keywords</button>
+      </form>
+
+      <hr />
+
+      <h3>Search for Files</h3>
+      <form method="GET" action="{{ url_for('search') }}">
+        <div class="form-group">
+          <input
+            type="text"
+            name="q"
+            class="form-control"
+            placeholder="Enter keyword to search"
+          />
+        </div>
+        <button type="submit" class="btn btn-info">Search</button>
       </form>
     </div>
   </body>

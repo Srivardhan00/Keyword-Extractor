@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Search Files</title>
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+    />
+  </head>
+  <body>
+    <div class="container">
+      <h2>Search Files by Keywords</h2>
+      <form method="GET" action="{{ url_for('search') }}">
+        <div class="form-group">
+          <input
+            type="text"
+            name="q"
+            class="form-control"
+            placeholder="Enter keyword to search"
+          />
+        </div>
+        <button type="submit" class="btn btn-primary">Search</button>
+      </form>
+
+      {% if results %}
+      <h3>Matching Files</h3>
+      <ul class="list-group">
+        {% for file, keywords in results.items() %}
+        <li class="list-group-item">
+          <strong>{{ file }}</strong> (Keywords: {{ keywords | join(', ') }})
+        </li>
+        {% endfor %}
+      </ul>
+      {% elif request.args.get('q') %}
+      <p>
+        No files found for keyword: <strong>{{ request.args.get('q') }}</strong>
+      </p>
+      {% endif %}
+
+      <a href="{{ url_for('index') }}" class="btn btn-primary">Upload File</a>
+    </div>
+  </body>
+</html>

@@ -1,17 +1,43 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <title>Keyword Extraction Results</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"/>
-</head>
-<body>
+  <head>
+    <title>Extracted Keywords</title>
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+    />
+  </head>
+  <body>
     <div class="container">
-        <h2>Keyword Extraction Results</h2>
-        <ul class="list-group">
-            {% for keyword in keywords %}
-            <li class="list-group-item">{{ keyword }}</li>
+      <h2>Extracted Keywords</h2>
+      {% for file, keywords in keywords.items() %}
+      <h3>{{ file }}</h3>
+      <ul>
+        {% for keyword in keywords %}
+        <li>{{ keyword }}</li>
+        {% endfor %}
+      </ul>
+      {% endfor %}
+
+      <h2>Related Files</h2>
+      {% for file, related in related_files.items() %}
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <strong>{{ file }}</strong> is related to:
+        </div>
+        <div class="panel-body">
+          <ul>
+            {% for rfile in related %}
+            <li>{{ rfile }}</li>
             {% endfor %}
-        </ul>
+          </ul>
+        </div>
+      </div>
+      {% endfor %}
+
+      <a href="{{ url_for('index') }}" class="btn btn-primary"
+        >Upload Another</a
+      >
     </div>
-</body>
+  </body>
 </html>
