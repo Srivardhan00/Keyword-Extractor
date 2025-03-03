@@ -9,6 +9,7 @@ from PyPDF2 import PdfReader
 import docx
 from nltk.stem import WordNetLemmatizer
 from collections import defaultdict
+from clustering import DocumentClustering  # Import clustering module
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = 'uploads'
@@ -93,9 +94,7 @@ def index():
     return render_template('index.html')
 
 @app.route('/process', methods=['POST'])
-def process_text():
-    print("Received Request")
-    
+def process_text():    
     text = request.form.get('text')
     files = request.files.getlist('files')  # Get multiple files
 
@@ -151,6 +150,39 @@ def search():
 
     matching_files = {file: keywords for file, keywords in file_keywords.items() if query in keywords}
     return render_template('search.html', results=matching_files)
+
+
+@app.route('/clusters')
+def cluster_documents():
+    """Handles document clustering and displays groups"""
+
+    if not file_keywords:
+        print("No files found")
+        return "No documents available for clustering."
+
+    clustering_model = DocumentClustering(num_clusters=3)
+    file_names = list(file_keywords.keys())
+    document_texts = [" ".join(file_keywords[file]) for file in file_names]
+
+    print(f"Files being clustered: {file_names}")
+    clusters = clustering_model.get_clusters(file_names, document_texts)
+
+    print(f"Clusters formed: {clusters}")
+    return render_template('clusters.html', clusters=clusters)
+
+@app.errorhandler(404)
+def not_found_error(error):
+    return render_template("error.html", message="Page not found!"), 404
+
+@app.errorhandler(500)
+def internal_error(error):
+    return render_template("error.html", message="Internal server error! Please try again."), 500
+
+@app.errorhandler(Exception)
+def handle_exception(e):
+    error_message = str(e)  # Get actual error message
+    print(f"Error Occurred: {error_message}")  # Log error in the console
+    return render_template("error.html", message=error_message), 500
 
 if __name__ == '__main__':
     if not os.path.exists(app.config['UPLOAD_FOLDER']):

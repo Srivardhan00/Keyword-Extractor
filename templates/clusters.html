@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Document Clusters</title>
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+    />
+  </head>
+  <body>
+    <div class="container">
+      <h2>Document Clusters</h2>
+      {% for cluster, files in clusters.items() %}
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <strong>Cluster {{ cluster + 1 }}</strong>
+        </div>
+        <div class="panel-body">
+          <ul>
+            {% for file in files %}
+            <li>{{ file }}</li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+      {% endfor %}
+      <a href="/" class="btn btn-primary">Upload More Files</a>
+    </div>
+  </body>
+</html>
