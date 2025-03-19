@@ -13,6 +13,7 @@ lemmatizer = WordNetLemmatizer()
 
 def preprocess_text(text):
     text = text.lower()
+    text = re.sub(r'<.*?>', '', text)  # Remove HTML tags
     text = re.sub(r'[^a-zA-Z]', ' ', text)
     words = nltk.word_tokenize(text)
     words = [lemmatizer.lemmatize(word) for word in words if word not in stopwords_set and len(word) > 3]
