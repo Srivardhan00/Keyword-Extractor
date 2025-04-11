@@ -73,6 +73,8 @@ def cluster_documents():
         return "No documents available for clustering."
 
     clustering_model = DocumentClustering(num_clusters=3)
+    if 'text_input'in file_keywords:
+        del file_keywords['text_input']
     file_names = list(file_keywords.keys())
     document_texts = [" ".join(file_keywords[file]) for file in file_names]
 
