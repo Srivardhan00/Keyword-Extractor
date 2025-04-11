@@ -1,13 +1,14 @@
-from PyPDF2 import PdfReader
 import docx
+import pdfplumber
 
-def extract_text_from_pdf(pdf_path):
+def extract_text_from_pdf(path):
     text = ""
-    with open(pdf_path, 'rb') as file:
-        reader = PdfReader(file)
-        for page in reader.pages:
-            text += page.extract_text() or ''
-    return text.strip()
+    with pdfplumber.open(path) as pdf:
+        for page in pdf.pages:
+            page_text = page.extract_text()
+            if page_text:
+                text += page_text + "\n"
+    return text
 
 def extract_text_from_docx(docx_path):
     doc = docx.Document(docx_path)
