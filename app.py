@@ -1,6 +1,6 @@
 from flask import Flask, request, render_template, redirect, url_for
 from werkzeug.utils import secure_filename
-from modules.keyword_extraction import extract_keywords, preprocess_text
+from modules.keyword_extraction import extract_keywords, preprocess_text, get_synonyms
 from modules.file_processing import extract_text_from_pdf, extract_text_from_docx
 from modules.clustering import DocumentClustering
 from modules.utils import allowed_file, find_related_files
@@ -90,8 +90,14 @@ def search():
     query = request.args.get('q', '').lower()
     if not query:
         return render_template('search.html', results={})
-
-    matching_files = {file: keywords for file, keywords in file_keywords.items() if query in keywords}
+    query = query.lower()
+    query_synonyms = get_synonyms(query)
+    search_terms = {query} | query_synonyms  # Combine query + synonyms
+    matching_files = {
+        file: keywords
+        for file, keywords in file_keywords.items()
+        if any(term in keywords for term in search_terms)
+    }
     return render_template('search.html', results=matching_files)
 
 @app.errorhandler(404)

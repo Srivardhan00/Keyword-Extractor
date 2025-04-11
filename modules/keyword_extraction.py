@@ -3,6 +3,7 @@ import nltk
 from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
 from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
+from nltk.corpus import wordnet as wn
 
 nltk.download('punkt')
 nltk.download('stopwords')
@@ -32,3 +33,12 @@ def extract_keywords(docs, topN):
     sorted_items = sorted(word_scores, key=lambda x: x[1], reverse=True)
 
     return {word: round(score, 3) for word, score in sorted_items[:topN]}
+
+def get_synonyms(word):
+  synonyms = set()
+  for syn in wn.synsets(word):
+      for lemma in syn.lemmas():
+          name = lemma.name().replace("_", " ").lower()
+          if name != word.lower():
+              synonyms.add(name)
+  return synonyms
