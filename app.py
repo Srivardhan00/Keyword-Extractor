@@ -51,13 +51,17 @@ def process_text():
                 file_text = extract_text_from_docx(file_path)
             else:
                 file_text = ""
-
             if file_text:
                 text_list = file_text.split('.')
                 docs = [preprocess_text(sentence) for sentence in text_list if sentence]
                 keywords = extract_keywords(docs, num_keywords)
 
                 all_keywords[filename] = list(keywords.keys())  # Store keywords
+            # 🗑️ Delete file after parsing
+            try:
+                os.remove(file_path)
+            except FileNotFoundError:
+                pass
 
     # Store all extracted keywords
     file_keywords.update(all_keywords)
