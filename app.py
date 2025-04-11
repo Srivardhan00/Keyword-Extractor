@@ -5,8 +5,9 @@ from modules.file_processing import extract_text_from_pdf, extract_text_from_doc
 from modules.clustering import DocumentClustering
 from modules.utils import allowed_file, find_related_files
 import os
-
+import traceback
 import logging
+
 logging.getLogger("pdfminer").setLevel(logging.ERROR)
 logging.getLogger("pdfplumber").setLevel(logging.ERROR)
 
@@ -110,10 +111,14 @@ def not_found_error(error):
 
 @app.errorhandler(500)
 def internal_error(error):
+    # Log traceback for internal server errors too
+    traceback.print_exc()
     return render_template("error.html", message="Internal server error! Please try again."), 500
 
 @app.errorhandler(Exception)
 def handle_exception(e):
+    # Print full traceback in console
+    traceback.print_exc()
     return render_template("error.html", message=str(e)), 500
 
 if __name__ == '__main__':
