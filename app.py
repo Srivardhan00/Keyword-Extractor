@@ -6,6 +6,10 @@ from modules.clustering import DocumentClustering
 from modules.utils import allowed_file, find_related_files
 import os
 
+import logging
+logging.getLogger("pdfminer").setLevel(logging.ERROR)
+logging.getLogger("pdfplumber").setLevel(logging.ERROR)
+
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = 'uploads'
 app.config['ALLOWED_EXTENSIONS'] = {'pdf', 'docx'}
