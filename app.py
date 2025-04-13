@@ -10,6 +10,12 @@ import traceback
 import logging
 from db_config import file_collection
 from controllers.file_controller import file_routes  # Import the blueprint
+from datetime import datetime
+
+from flask_cors import CORS
+
+app = Flask(__name__)
+CORS(app)  # Enable CORS for all routes
 
 logging.getLogger("pdfminer").setLevel(logging.ERROR)
 logging.getLogger("pdfplumber").setLevel(logging.ERROR)
