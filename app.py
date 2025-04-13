@@ -4,9 +4,12 @@ from modules.keyword_extraction import extract_keywords, preprocess_text, get_sy
 from modules.file_processing import extract_text_from_pdf, extract_text_from_docx
 from modules.clustering import DocumentClustering
 from modules.utils import allowed_file, find_related_files
+from pymongo import MongoClient
 import os
 import traceback
 import logging
+from db_config import file_collection
+from controllers.file_controller import file_routes  # Import the blueprint
 
 logging.getLogger("pdfminer").setLevel(logging.ERROR)
 logging.getLogger("pdfplumber").setLevel(logging.ERROR)
@@ -14,6 +17,9 @@ logging.getLogger("pdfplumber").setLevel(logging.ERROR)
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = 'uploads'
 app.config['ALLOWED_EXTENSIONS'] = {'pdf', 'docx'}
+
+# Register the file_routes blueprint
+app.register_blueprint(file_routes)
 
 file_keywords = {}  # Global dictionary for storing extracted keywords
 
@@ -63,6 +69,15 @@ def process_text():
 
                 all_keywords[filename] = list(keywords.keys())  # Store keywords
             # 🗑️ Delete file after parsing
+            file_data = {
+                "file_name": filename,
+                "keywords": list(keywords.keys()),
+                "file_type": "pdf" if filename.endswith('.pdf') else "docx",
+                "description": "",
+                "created_at": datetime.utcnow(),
+                "updated_at": datetime.utcnow(),
+            }
+            file_collection.insert_one(file_data)
             try:
                 os.remove(file_path)
             except FileNotFoundError:
