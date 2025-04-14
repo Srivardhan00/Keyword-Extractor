@@ -1,17 +1,16 @@
-from flask import Flask, request, render_template, redirect, url_for
+from flask import Flask, request, render_template
 from werkzeug.utils import secure_filename
 from modules.keyword_extraction import extract_keywords, preprocess_text, get_synonyms
 from modules.file_processing import extract_text_from_pdf, extract_text_from_docx
 from modules.clustering import DocumentClustering
 from modules.utils import allowed_file, find_related_files
-from pymongo import MongoClient
 import os
 import traceback
 import logging
 from db_config import file_collection
 from controllers.file_controller import file_routes  # Import the blueprint
 from datetime import datetime
-
+import math
 from flask_cors import CORS
 
 app = Flask(__name__)
@@ -125,12 +124,28 @@ def search():
     query = query.lower()
     query_synonyms = get_synonyms(query)
     search_terms = {query} | query_synonyms  # Combine query + synonyms
-    matching_files = {
-        file: keywords
-        for file, keywords in file_keywords.items()
-        if any(term in keywords for term in search_terms)
+    
+    # Create MongoDB query
+    search_query = {
+        "$or": [
+            {"filename": {"$regex": query, "$options": "i"}},
+            {"keywords": {"$in": list(search_terms)}}
+        ]
     }
-    return render_template('search.html', results=matching_files)
+    
+    # Get total count before pagination
+    total_count = file_collection.count_documents(search_query)
+
+    cursor = file_collection.find(search_query)
+    
+    # Format results for template
+    matching_files = {}
+    for file in cursor:
+        filename = file.get("file_name", "")
+        keywords = file.get("keywords", [])
+        matching_files[filename] = keywords
+    
+    return render_template('search.html',results=matching_files, total_count=total_count)
 
 @app.route('/view-files')
 def view_files():
