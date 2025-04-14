@@ -1,43 +1,180 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Extracted Keywords</title>
     <link
       rel="stylesheet"
-      href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
     />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+    <link rel="stylesheet" href="../static/css/keywords.css" />
   </head>
   <body>
-    <div class="container">
-      <h2>Extracted Keywords</h2>
-      {% for file, keywords in keywords.items() %}
-      <h3>{{ file }}</h3>
-      <ul>
-        {% for keyword in keywords %}
-        <li>{{ keyword }}</li>
-        {% endfor %}
-      </ul>
-      {% endfor %}
-
-      <h2>Related Files</h2>
-      {% for file, related in related_files.items() %}
-      <div class="panel panel-default">
-        <div class="panel-heading">
-          <strong>{{ file }}</strong> is related to:
+    <div class="app-container">
+      <nav class="navbar">
+        <div class="container">
+          <a class="navbar-brand" href="#">
+            <i class="fas fa-key me-2"></i>
+            KeywordFinder
+          </a>
         </div>
-        <div class="panel-body">
-          <ul>
-            {% for rfile in related %}
-            <li>{{ rfile }}</li>
-            {% endfor %}
-          </ul>
+      </nav>
+
+      <div class="container main-content">
+        <div class="results-header">
+          <h1>Analysis Results</h1>
+          <p class="lead">
+            Here are the keywords extracted from your content and related file
+            connections.
+          </p>
+        </div>
+
+        <div class="row">
+          <div class="col-lg-7">
+            <div class="content-card keywords-card">
+              <div class="card-header-custom">
+                <h2><i class="fas fa-tags me-2"></i>Extracted Keywords</h2>
+              </div>
+              <div class="card-body">
+                {% if keywords %}
+                <div class="accordion" id="keywordsAccordion">
+                  {% for file, keywords_list in keywords.items() %}
+                  <div class="accordion-item">
+                    <h2 class="accordion-header" id="heading-{{ loop.index }}">
+                      <button
+                        class="accordion-button"
+                        type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#collapse-{{ loop.index }}"
+                        aria-expanded="{% if loop.first %}true{% else %}false{% endif %}"
+                        aria-controls="collapse-{{ loop.index }}"
+                      >
+                        <span class="file-icon"
+                          ><i
+                            class="{% if file.endswith('.pdf') %}fas fa-file-pdf{% else %}fas fa-file-word{% endif %}"
+                          ></i
+                        ></span>
+                        {{ file }}
+                      </button>
+                    </h2>
+                    <div
+                      id="collapse-{{ loop.index }}"
+                      class="accordion-collapse collapse {% if loop.first %}show{% endif %}"
+                      aria-labelledby="heading-{{ loop.index }}"
+                      data-bs-parent="#keywordsAccordion"
+                    >
+                      <div class="accordion-body">
+                        <div class="keywords-container">
+                          {% for keyword in keywords_list %}
+                          <span class="keyword-badge">{{ keyword }}</span>
+                          {% endfor %}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  {% endfor %}
+                </div>
+                {% else %}
+                <div class="empty-state">
+                  <i class="fas fa-search"></i>
+                  <p>
+                    No keywords extracted. Try uploading a different document.
+                  </p>
+                </div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-5">
+            <div class="content-card related-card">
+              <div class="card-header-custom">
+                <h2>
+                  <i class="fas fa-project-diagram me-2"></i>Related Files
+                </h2>
+              </div>
+              <div class="card-body">
+                {% if related_files %}
+                <div class="related-files-list">
+                  {% for file, related in related_files.items() %}
+                  <div class="related-file-item">
+                    <div class="related-file-header">
+                      <span class="file-icon"
+                        ><i
+                          class="{% if file.endswith('.pdf') %}fas fa-file-pdf{% else %}fas fa-file-word{% endif %}"
+                        ></i
+                      ></span>
+                      <h3>{{ file }}</h3>
+                    </div>
+                    <div class="related-connections">
+                      <p class="related-label">Related to:</p>
+                      {% for rfile in related %}
+                      <div class="connection-item">
+                        <span class="connection-icon"
+                          ><i class="fas fa-link"></i
+                        ></span>
+                        <span class="connection-name">{{ rfile }}</span>
+                      </div>
+                      {% endfor %}
+                    </div>
+                  </div>
+                  {% endfor %}
+                </div>
+                {% else %}
+                <div class="empty-state">
+                  <i class="fas fa-network-wired"></i>
+                  <p>No file relationships detected.</p>
+                </div>
+                {% endif %}
+              </div>
+            </div>
+
+            <div class="action-buttons">
+              <a href="{{ url_for('index') }}" class="btn btn-primary btn-lg">
+                <i class="fas fa-upload me-2"></i>Upload Another
+              </a>
+              <a
+                href="http://127.0.0.1:5000/clusters"
+                class="btn btn-success btn-lg ms-2"
+              >
+                <i class="fas fa-layer-group me-2"></i>Go to Clusters
+              </a>
+            </div>
+          </div>
         </div>
       </div>
-      {% endfor %}
 
-      <a href="{{ url_for('index') }}" class="btn btn-primary">Upload Another</a>
-      <!-- New button to redirect to clusters page -->
-      <a href="http://127.0.0.1:5000/clusters" class="btn btn-success">Go to Clusters</a>
+      <footer class="footer">
+        <div class="container">
+          <p>&copy; 2025 KeywordFinder. All rights reserved.</p>
+        </div>
+      </footer>
     </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      // Simple animation for content cards
+      document.addEventListener("DOMContentLoaded", function () {
+        const animateElements = document.querySelectorAll(
+          ".results-header, .content-card"
+        );
+
+        animateElements.forEach((element, index) => {
+          element.style.opacity = "0";
+          element.style.transform = "translateY(20px)";
+          element.style.transition = "opacity 0.5s ease, transform 0.5s ease";
+
+          setTimeout(() => {
+            element.style.opacity = "1";
+            element.style.transform = "translateY(0)";
+          }, 100 + index * 150);
+        });
+      });
+    </script>
   </body>
 </html>

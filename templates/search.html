@@ -1,43 +1,482 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
-    <title>Search Files</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document Search Engine</title>
+    <!-- Using Bootstrap 5 -->
     <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css"
       rel="stylesheet"
-      href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
     />
+    <!-- Font Awesome for icons -->
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+      rel="stylesheet"
+    />
+    <!-- Google Font -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      :root {
+        --primary-color: #5469d4;
+        --secondary-color: #1a2280;
+        --light-color: #f0f4ff;
+        --dark-color: #0f172a;
+        --success-color: #10b981;
+        --border-radius: 8px;
+        --box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        --transition: all 0.3s ease;
+      }
+
+      body {
+        font-family: "Poppins", sans-serif;
+        background-color: #f8fafc;
+        color: #333;
+        padding-top: 2rem;
+        padding-bottom: 2rem;
+      }
+
+      .app-container {
+        max-width: 900px;
+        margin: 0 auto;
+        background-color: white;
+        border-radius: var(--border-radius);
+        box-shadow: var(--box-shadow);
+        padding: 2rem;
+      }
+
+      .app-header {
+        text-align: center;
+        margin-bottom: 2rem;
+        position: relative;
+      }
+
+      .app-title {
+        color: var(--primary-color);
+        font-weight: 600;
+        margin-bottom: 1rem;
+        font-size: 2rem;
+      }
+
+      .app-subtitle {
+        color: #64748b;
+        font-weight: 400;
+        font-size: 1rem;
+        margin-bottom: 2rem;
+      }
+
+      .search-form {
+        position: relative;
+        margin-bottom: 2rem;
+      }
+
+      .search-input {
+        border: 2px solid #e2e8f0;
+        border-radius: var(--border-radius);
+        padding: 0.75rem 1rem 0.75rem 3rem;
+        font-size: 1rem;
+        width: 100%;
+        transition: var(--transition);
+      }
+
+      .search-input:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(84, 105, 212, 0.25);
+        outline: none;
+      }
+
+      .search-icon {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #94a3b8;
+      }
+
+      .search-button {
+        background-color: var(--primary-color);
+        color: white;
+        border: none;
+        border-radius: var(--border-radius);
+        padding: 0.75rem 1.5rem;
+        font-weight: 500;
+        transition: var(--transition);
+        margin-top: 1rem;
+        width: 100%;
+      }
+
+      .search-button:hover {
+        background-color: var(--secondary-color);
+        transform: translateY(-2px);
+      }
+
+      .results-container {
+        margin-top: 2rem;
+        opacity: 0;
+        transform: translateY(10px);
+        transition: var(--transition);
+      }
+
+      .results-container.show {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      .results-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 1px solid #e2e8f0;
+      }
+
+      .results-title {
+        color: var(--dark-color);
+        font-weight: 600;
+        margin: 0;
+        font-size: 1.25rem;
+      }
+
+      .results-count {
+        color: #64748b;
+        font-size: 0.875rem;
+        font-weight: 500;
+      }
+
+      .file-list {
+        list-style-type: none;
+        padding: 0;
+        margin: 0;
+      }
+
+      .file-item {
+        background-color: white;
+        border: 1px solid #e2e8f0;
+        border-radius: var(--border-radius);
+        padding: 1rem;
+        margin-bottom: 1rem;
+        transition: var(--transition);
+        display: flex;
+        align-items: center;
+        animation: fadeIn 0.5s ease forwards;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .file-item:hover {
+        border-color: var(--primary-color);
+        box-shadow: 0 2px 8px rgba(84, 105, 212, 0.15);
+      }
+
+      .file-icon {
+        color: var(--primary-color);
+        font-size: 1.5rem;
+        margin-right: 1rem;
+        min-width: 2rem;
+        text-align: center;
+      }
+
+      .file-content {
+        flex: 1;
+      }
+
+      .file-name {
+        font-weight: 500;
+        color: var(--dark-color);
+        margin: 0 0 0.25rem 0;
+        font-size: 1rem;
+      }
+
+      .file-keywords {
+        color: #64748b;
+        font-size: 0.875rem;
+        margin: 0;
+      }
+
+      .keyword-badge {
+        display: inline-block;
+        background-color: var(--light-color);
+        color: var(--primary-color);
+        border-radius: 20px;
+        padding: 0.2rem 0.6rem;
+        margin-right: 0.5rem;
+        margin-top: 0.25rem;
+        font-size: 0.75rem;
+        font-weight: 500;
+      }
+
+      .no-results {
+        text-align: center;
+        padding: 2rem 0;
+        color: #64748b;
+      }
+
+      .no-results-icon {
+        font-size: 3rem;
+        color: #cbd5e1;
+        margin-bottom: 1rem;
+      }
+
+      .no-results-text {
+        font-weight: 500;
+      }
+
+      .no-results-keyword {
+        color: var(--primary-color);
+        font-weight: 600;
+      }
+
+      .action-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background-color: white;
+        color: var(--primary-color);
+        border: 1px solid #e2e8f0;
+        border-radius: var(--border-radius);
+        padding: 0.5rem 1rem;
+        font-weight: 500;
+        transition: var(--transition);
+        text-decoration: none;
+        margin-top: 1rem;
+      }
+
+      .action-button:hover {
+        background-color: var(--light-color);
+        border-color: var(--primary-color);
+        color: var(--primary-color);
+      }
+
+      .action-button i {
+        margin-right: 0.5rem;
+      }
+
+      /* Responsive Adjustments */
+      @media (max-width: 576px) {
+        .app-container {
+          padding: 1.5rem;
+        }
+
+        .app-title {
+          font-size: 1.75rem;
+        }
+
+        .file-item {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+
+        .file-icon {
+          margin-bottom: 0.5rem;
+        }
+      }
+
+      .loading {
+        display: none;
+        text-align: center;
+        padding: 2rem 0;
+      }
+
+      .loading-spinner {
+        width: 40px;
+        height: 40px;
+        border: 3px solid #f3f3f3;
+        border-top: 3px solid var(--primary-color);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 1rem;
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+    </style>
   </head>
   <body>
-    <div class="container">
-      <h2>Search Files by Keywords</h2>
-      <form method="GET" action="{{ url_for('search') }}">
-        <div class="form-group">
+    <div class="container app-container">
+      <div class="app-header">
+        <h1 class="app-title">Document Search Engine</h1>
+        <p class="app-subtitle">
+          Find files by keywords quickly and efficiently
+        </p>
+      </div>
+
+      <form
+        method="GET"
+        action="{{ url_for('search') }}"
+        id="searchForm"
+        class="search-form"
+      >
+        <div class="position-relative">
+          <i class="fas fa-search search-icon"></i>
           <input
             type="text"
             name="q"
-            class="form-control"
-            placeholder="Enter keyword to search"
+            id="searchInput"
+            class="form-control search-input"
+            placeholder="Enter keyword to search..."
+            value="{{ request.args.get('q', '') }}"
+            autocomplete="off"
           />
         </div>
-        <button type="submit" class="btn btn-primary">Search</button>
+        <button type="submit" class="btn search-button">
+          <i class="fas fa-search me-2"></i>Search Documents
+        </button>
       </form>
 
+      <div class="loading" id="loadingIndicator">
+        <div class="loading-spinner"></div>
+        <p>Searching documents...</p>
+      </div>
+
       {% if results %}
-      <h3>Matching Files</h3>
-      <ul class="list-group">
-        {% for file, keywords in results.items() %}
-        <li class="list-group-item">
-          <strong>{{ file }}</strong> (Keywords: {{ keywords | join(', ') }})
-        </li>
-        {% endfor %}
-      </ul>
+      <div class="results-container show" id="resultsContainer">
+        <div class="results-header">
+          <h3 class="results-title">Search Results</h3>
+          <span class="results-count"
+            >{{ results|length }} file{% if results|length != 1 %}s{% endif %}
+            found</span
+          >
+        </div>
+
+        <ul class="file-list">
+          {% for file, keywords in results.items() %}
+          <li class="file-item">
+            <div class="file-icon">
+              <i class="fas fa-file-alt"></i>
+            </div>
+            <div class="file-content">
+              <h4 class="file-name">{{ file }}</h4>
+              <div class="file-keywords">
+                {% for keyword in keywords %}
+                <span class="keyword-badge">{{ keyword }}</span>
+                {% endfor %}
+              </div>
+            </div>
+          </li>
+          {% endfor %}
+        </ul>
+      </div>
       {% elif request.args.get('q') %}
-      <p>
-        No files found for keyword: <strong>{{ request.args.get('q') }}</strong>
-      </p>
+      <div class="results-container show" id="noResultsContainer">
+        <div class="no-results">
+          <div class="no-results-icon">
+            <i class="fas fa-search"></i>
+          </div>
+          <p class="no-results-text">
+            No files found for keyword:
+            <span class="no-results-keyword">{{ request.args.get('q') }}</span>
+          </p>
+        </div>
+      </div>
       {% endif %}
 
-      <a href="{{ url_for('index') }}" class="btn btn-primary">Upload File</a>
+      <div class="text-center mt-4">
+        <a href="{{ url_for('index') }}" class="action-button">
+          <i class="fas fa-upload"></i> Upload New File
+        </a>
+      </div>
     </div>
+
+    <!-- JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script>
+      $(document).ready(function () {
+        // Focus search input on page load
+        $("#searchInput").focus();
+
+        // Animate results container
+        $(".results-container").addClass("show");
+
+        // Animated typing effect for empty search box
+        if ($("#searchInput").val() === "") {
+          const placeholders = [
+            'Search for "report"...',
+            'Try "presentation"...',
+            'Look for "data"...',
+            'Find "document"...',
+          ];
+
+          let currentIndex = 0;
+
+          function cyclePlaceholder() {
+            const placeholder = placeholders[currentIndex];
+            let charIndex = 0;
+
+            // Clear the placeholder first
+            $("#searchInput").attr("placeholder", "");
+
+            // Type the new placeholder
+            const typingInterval = setInterval(function () {
+              if (charIndex < placeholder.length) {
+                $("#searchInput").attr(
+                  "placeholder",
+                  $("#searchInput").attr("placeholder") +
+                    placeholder.charAt(charIndex)
+                );
+                charIndex++;
+              } else {
+                clearInterval(typingInterval);
+
+                // Wait and then prepare for next placeholder
+                setTimeout(function () {
+                  currentIndex = (currentIndex + 1) % placeholders.length;
+                  cyclePlaceholder();
+                }, 2000);
+              }
+            }, 100);
+          }
+
+          cyclePlaceholder();
+        }
+
+        // Show loading indicator when form is submitted
+        $("#searchForm").on("submit", function () {
+          if ($("#searchInput").val().trim() !== "") {
+            $("#loadingIndicator").fadeIn();
+            $(".results-container").removeClass("show");
+
+            // Add a minimal delay to show the loading animation
+            // In a real app, this would be handled by the server response time
+            setTimeout(function () {
+              $("#loadingIndicator").fadeOut();
+            }, 500);
+          }
+        });
+
+        // Staggered animation for file items
+        $(".file-item").each(function (index) {
+          $(this).css("animation-delay", index * 0.1 + "s");
+        });
+
+        // Subtle hover effect for search input
+        $("#searchInput")
+          .on("focus", function () {
+            $(this).parent().addClass("focused");
+          })
+          .on("blur", function () {
+            $(this).parent().removeClass("focused");
+          });
+      });
+    </script>
   </body>
 </html>
