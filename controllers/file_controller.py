@@ -1,15 +1,9 @@
 from flask import Blueprint, request, jsonify
-from pymongo import MongoClient
 from bson.objectid import ObjectId
 from datetime import datetime
+from db_config import file_collection  # Import file_collection from db_config
 
 file_routes = Blueprint("file_routes", __name__)
-
-# MongoDB configuration
-MONGO_URI = "mongodb://localhost:27017/"
-client = MongoClient(MONGO_URI)
-db = client["keyword_extractor"]  # Replace with your database name
-file_collection = db["files"]  # Collection for storing file data
 
 # Create a new file
 @file_routes.route("/files", methods=["POST"])

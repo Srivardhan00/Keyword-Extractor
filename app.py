@@ -34,12 +34,16 @@ def index():
     return render_template('index.html')
 
 @app.route('/process', methods=['POST'])
-def process_text():
+def process():
     global file_keywords  # Use the global dictionary
-    
+
+
     text = request.form.get('text')  # Get the single text input
     files = request.files.getlist('files')  # Get uploaded files
     num_keywords = int(request.form.get('keyword_count', 10))
+    # print(f"Files received: {len(files)}")
+    # for file in files:
+    #     print(f"File: {file.filename}")
 
     all_keywords = {}  # Store keywords for both files and text
 
@@ -74,6 +78,8 @@ def process_text():
                 keywords = extract_keywords(docs, num_keywords)
 
                 all_keywords[filename] = list(keywords.keys())  # Store keywords
+            else:
+                all_keywords[filename] = ["No text extracted"]  # Handle empty text case
             # 🗑️ Delete file after parsing
             file_data = {
                 "file_name": filename,
@@ -98,7 +104,7 @@ def process_text():
     return render_template('keywords.html', keywords=all_keywords, related_files=related_files)
 
 @app.route('/clusters')
-def cluster_documents():
+def clusters():
     if not file_keywords:
         return "No documents available for clustering."
 
@@ -125,6 +131,10 @@ def search():
         if any(term in keywords for term in search_terms)
     }
     return render_template('search.html', results=matching_files)
+
+@app.route('/view-files')
+def view_files():
+    return render_template('files.html')  # Make sure this template exists
 
 @app.errorhandler(404)
 def not_found_error(error):
