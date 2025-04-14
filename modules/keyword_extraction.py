@@ -21,18 +21,22 @@ def preprocess_text(text):
     return " ".join(words)
 
 def extract_keywords(docs, topN):
-    combined_text = " ".join(docs)
-    vectorizer = CountVectorizer(max_df=1, min_df=0.2, max_features=5000)
-    word_count_vector = vectorizer.fit_transform([combined_text])
+    try:
+        combined_text = " ".join(docs)
+        vectorizer = CountVectorizer(max_df=1, min_df=0.2, max_features=5000)
+        word_count_vector = vectorizer.fit_transform([combined_text])
 
-    tfidf_transformer = TfidfTransformer(smooth_idf=True, use_idf=True)
-    tfidf_vector = tfidf_transformer.fit_transform(word_count_vector).tocoo()
+        tfidf_transformer = TfidfTransformer(smooth_idf=True, use_idf=True)
+        tfidf_vector = tfidf_transformer.fit_transform(word_count_vector).tocoo()
 
-    feature_names = vectorizer.get_feature_names_out()
-    word_scores = [(feature_names[idx], score) for idx, score in zip(tfidf_vector.col, tfidf_vector.data)]
-    sorted_items = sorted(word_scores, key=lambda x: x[1], reverse=True)
+        feature_names = vectorizer.get_feature_names_out()
+        word_scores = [(feature_names[idx], score) for idx, score in zip(tfidf_vector.col, tfidf_vector.data)]
+        sorted_items = sorted(word_scores, key=lambda x: x[1], reverse=True)
 
-    return {word: round(score, 3) for word, score in sorted_items[:topN]}
+        return {word: round(score, 3) for word, score in sorted_items[:topN]}
+    except Exception as e:
+        print(f"Error in extract_keywords: {e}")
+        return {["NO KEYWORDS FOUND"]}
 
 def get_synonyms(word):
   synonyms = set()
