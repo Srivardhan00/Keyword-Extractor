@@ -12,7 +12,6 @@ document.addEventListener("DOMContentLoaded", function () {
   const prevPage = document.getElementById("prevPage");
   const nextPage = document.getElementById("nextPage");
   const pageIndicator = document.getElementById("pageIndicator");
-  const searchInput = document.getElementById("searchInput");
 
   // Bootstrap components
   const editModal = new bootstrap.Modal(document.getElementById("editModal"));
@@ -46,14 +45,6 @@ document.addEventListener("DOMContentLoaded", function () {
     loadFiles(currentPage);
   });
 
-  searchInput.addEventListener(
-    "input",
-    debounce(() => {
-      currentPage = 1;
-      loadFiles(currentPage);
-    }, 300)
-  );
-
   keywordInput.addEventListener("keypress", function (e) {
     if (e.key === "Enter") {
       e.preventDefault();
@@ -75,12 +66,8 @@ document.addEventListener("DOMContentLoaded", function () {
     `;
 
     try {
-      const searchQuery = searchInput.value;
       let url = `/files?page=${page}&limit=${limit}`;
 
-      if (searchQuery) {
-        url += `&search=${encodeURIComponent(searchQuery)}`;
-      }
 
       console.log(`Fetching data from URL: ${url}`); // Debugging fetch URL
 
