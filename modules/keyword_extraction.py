@@ -20,10 +20,12 @@ def preprocess_text(text):
     words = [lemmatizer.lemmatize(word) for word in words if word not in stopwords_set and len(word) > 3]
     return " ".join(words)
 
-def extract_keywords(docs, topN):
+def extract_keywords(docs, topN=10):
     try:
         combined_text = " ".join(docs)
-        vectorizer = CountVectorizer(max_df=1, min_df=0.2, max_features=5000)
+        vectorizer = CountVectorizer(max_df=1, min_df=0.2, max_features=5000, 
+                                    # ngram_range=(1, 2), 
+                                    stop_words='english')
         word_count_vector = vectorizer.fit_transform([combined_text])
 
         tfidf_transformer = TfidfTransformer(smooth_idf=True, use_idf=True)
