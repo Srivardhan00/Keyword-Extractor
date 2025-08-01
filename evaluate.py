@@ -25,7 +25,8 @@ def safe_extract_keywords(text, top_n=10):
 
 # Apply safely
 df['PredictedKeywords'] = df.apply(
-    lambda row: safe_extract_keywords(row['Articles'], top_n=int(0.5*len(row['GoldKeywords']))),
+    lambda row: safe_extract_keywords(row['Articles'], top_n=len(row['GoldKeywords'])),
+    # lambda row: safe_extract_keywords(row['Articles'], top_n=len(row['GoldKeywords'])),
     axis=1
 )
 

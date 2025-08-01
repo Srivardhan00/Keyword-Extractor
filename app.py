@@ -35,7 +35,8 @@ def index():
 @app.route('/process', methods=['POST'])
 def process():
     global file_keywords  # Use the global dictionary
-
+    files = []
+    file_keywords = {}
 
     text = request.form.get('text')  # Get the single text input
     files = request.files.getlist('files')  # Get uploaded files

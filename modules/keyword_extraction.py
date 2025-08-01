@@ -11,7 +11,7 @@ nltk.download('wordnet')
 
 stopwords_set = set(stopwords.words('english'))
 lemmatizer = WordNetLemmatizer()
-
+stopwords_set.add("nbsp")
 def preprocess_text(text):
     text = text.lower()
     text = re.sub(r'<.*?>', '', text)  # Remove HTML tags
